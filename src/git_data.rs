@@ -18,32 +18,21 @@ struct GitUrlData {
     owner: String,
 }
 
-pub fn get_git_data() -> GitData {
+pub fn get_git_data() -> Result<GitData, &'static str> {
     let git_command_args = get_git_command_args();
 
-    let branch_name = match get_command_output(git_command_args.branch) {
-        Ok(name) => name,
-        Err(e) => panic!("{}", e),
-    };
-
-    let remote_url = match get_command_output(git_command_args.remote_url) {
-        Ok(name) => name,
-        Err(e) => panic!("{}", e),
-    };
-
-    let main_branch_name = match get_command_output(git_command_args.main_branch) {
-        Ok(name) => name,
-        Err(e) => panic!("{}", e),
-    };
+    let branch_name = get_command_output(git_command_args.branch)?;
+    let remote_url = get_command_output(git_command_args.remote_url)?;
+    let main_branch_name = get_command_output(git_command_args.main_branch)?;
 
     let url_data = get_data_from_url(remote_url);
 
-    return GitData {
+    return Ok(GitData {
         branch: branch_name,
         main_branch: main_branch_name,
         repo_name: url_data.repo_name,
         owner: url_data.owner
-    }
+    })
 }
 
 fn get_git_command_args<'a>() -> GitCommandArgs<'a> {
