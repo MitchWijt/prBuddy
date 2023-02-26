@@ -1,8 +1,8 @@
 mod git_data;
+mod config_data;
 
 extern crate core;
 
-use std::str;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -21,9 +21,9 @@ fn main() {
 
     match &cli.command {
         Some(Commands::PushPR {title, description}) => {
-            let git_data = git_data::get_git_data();
+            let _git_data = git_data::get_git_data();
+            let _config_data = config_data::get_config_data();
 
-            // read out the .prHelper/.config file to get the ENV variables
             // call the GH API to create a PR
             // call the Slack API to post the PR link to the channel
         }
