@@ -24,9 +24,9 @@ async fn main() -> reqwest::Result<()> {
     match &cli.command {
         Some(Commands::PushPR {title, description}) => {
             let git_data = git_data::get_git_data().expect("error getting git data");
-            let _config_data = config_data::get_config_data();
+            let config_data = config_data::get_config_data().expect("error getting config");
 
-            call_gh_api(git_data).await?
+            call_gh_api(git_data, config_data.github_api_key).await?
             // call the GH API to create a PR
             // call the Slack API to post the PR link to the channel
         }
@@ -38,19 +38,20 @@ async fn main() -> reqwest::Result<()> {
     Ok(())
 }
 
-async fn call_gh_api(github_data: GitData) -> reqwest::Result<()> {
+async fn call_gh_api(github_data: GitData, token: String) -> reqwest::Result<()> {
     let body = r#"{"title":"Amazing new feature","body":"Please pull these awesome changes in!","head":"feature-github-api","base":"main"}"#;
 
     let client = reqwest::Client::new();
     let resp = client.post("https://api.github.com/repos/MitchWijt/prBuddy/pulls")
         .header("Accept", "application/vnd.github+json")
-        .header("Authorization", "Bearer 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")
+        .header("Authorization", format!("Bearer {}", token))
+        .header("User-Agent", format!("{}", github_data.repo_name))
         .header("X-GitHub-Api-Version", "2022-11-28")
         .body(body)
         .send()
         .await?;
 
-    println!("{:?}", resp);
+    println!("{:?}", resp.text().await?);
 
     Ok(())
 
