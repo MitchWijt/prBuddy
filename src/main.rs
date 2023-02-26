@@ -27,7 +27,8 @@ async fn main() -> reqwest::Result<()> {
             let git_data = git_data::get_git_data().expect("error getting git data");
             let config_data = config_data::get_config_data().expect("error getting config");
 
-            call_gh_api(git_data, config_data.github_api_key).await?
+            let response = call_gh_api(git_data, config_data.github_api_key).await?;
+            let url = get_url_from_response(response);
             // call the GH API to create a PR
             // call the Slack API to post the PR link to the channel
         }
@@ -39,7 +40,7 @@ async fn main() -> reqwest::Result<()> {
     Ok(())
 }
 
-async fn call_gh_api(github_data: GitData, token: String) -> reqwest::Result<()> {
+async fn call_gh_api(github_data: GitData, token: String) -> reqwest::Result<String> {
     let body = r#"{"title":"Amazing new feature","body":"Please pull these awesome changes in!","head":"integrate-github-api","base":"main"}"#;
 
     let client = reqwest::Client::new();
@@ -52,14 +53,17 @@ async fn call_gh_api(github_data: GitData, token: String) -> reqwest::Result<()>
         .send()
         .await?;
 
-    let response = resp.text().await?.as_str();
-    let root: Value = serde_json::from_str(response)?;
+    let response = resp.text().await?;
+    Ok(response)
+}
 
-    let url: Option<&str> = root.get("data")
-        .and_then(|value| value.get(0))
-        .and_then(|value| value.get("url"))
+fn get_url_from_response(response: String) -> serde_json::Result<()> {
+    let root: Value = serde_json::from_str(response.as_str())?;
+
+    let url: Option<&str> = root.get("url")
         .and_then(|value| value.as_str());
 
     println!("{:?}", url);
+
     Ok(())
 }
