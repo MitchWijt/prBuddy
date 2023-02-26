@@ -21,7 +21,7 @@ enum Commands {
 }
 
 #[tokio::main]
-async fn main() -> reqwest::Result<()> {
+async fn main() -> Result<(), &'static str> {
     let cli = Cli::parse();
 
     match &cli.command {
