@@ -52,7 +52,6 @@ async fn call_gh_api(github_data: GitData, token: String) -> reqwest::Result<()>
         .await?;
 
     println!("{:?}", resp.text().await?);
-
     Ok(())
 
     // let response = send(request.bo)
