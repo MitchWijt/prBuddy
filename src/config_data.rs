@@ -1,5 +1,5 @@
 use std::fs::{File, read_to_string};
-use std::{io, str};
+use std::{str};
 use std::io::{BufRead, BufReader};
 
 pub struct Config {
