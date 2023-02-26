@@ -592,8 +592,8 @@ name = "pr_buddy"
 version = "0.1.0"
 dependencies = [
  "clap",
- "http",
  "reqwest",
+ "serde_json",
  "shutil",
  "tokio",
 ]
