@@ -11,16 +11,16 @@ copy PR titles and URls's but have this one for you with one single command :-)
 3. run `cargo build --release`
 4. take the pr_buddy binary from `./target/release`
 5. place this binary in your own repo
-6. create a .prBuddy config file
-7. add this file to you .gitIgnore
+6. export the ENV variables on your machine
+7. add the binary file to your .gitIgnore
 
 You're all set :-) 
 
 now you can push your changes to a branch and open a PR with the following command `./pr_buddy push-pr <PR_TITLE>`
 
-here is an example for the .prBuddy config file. Both of these variables need to be included: 
+here is an example for the ENV variables. Both of these variables need to be included: 
 
 ```
-SLACK_WEBHOOK_URL=<YOUR WEBHOOK URL>
-GITHUB_API_KEY=<GITHUB PERSONAL ACCESS TOKEN>
+PR_BUDDY_SLACK_WEBHOOK_URL=<YOUR WEBHOOK URL>
+PR_BUDDY_GH_API_KEY=<GITHUB PERSONAL ACCESS TOKEN>
 ```
