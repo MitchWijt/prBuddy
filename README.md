@@ -12,11 +12,11 @@ run the following command to install with homebrew:
 - ```brew tap MitchWijt/prbuddy && brew install prbuddy```
 
 ### Manually
-2. Clone or fork this repo
-3. make sure you have installed cargo
-4. run `cargo build --release`
-5. take the pr_buddy binary from `./target/release`
-6. place this binary in your machine
+1. Clone or fork this repo
+2. make sure you have installed cargo
+3. run `cargo build --release`
+4. take the pr_buddy binary from `./target/release`
+5. place this binary in your machine
 
 ### Config variables
 prBuddy uses 2 config variables in order to work correctly. 
