@@ -4,18 +4,15 @@ use std::io::{BufRead, BufReader};
 
 pub struct Config {
     pub slack_webhook_url: String,
-    pub slack_channel: String,
     pub github_api_key: String
 }
 
 pub fn get_config_data() -> Result<Config, &'static str> {
     let slack_webhook_url = get_value_from_config_file("SLACK_WEBHOOK_URL")?;
-    let slack_channel = get_value_from_config_file("SLACK_CHANNEL")?;
     let github_api_key = get_value_from_config_file("GITHUB_API_KEY")?;
 
     return Ok(Config{
         slack_webhook_url,
-        slack_channel,
         github_api_key
     })
 }

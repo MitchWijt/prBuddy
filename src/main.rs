@@ -1,6 +1,7 @@
 mod git_data;
 mod config_data;
 mod git_api;
+mod slack_api;
 
 extern crate core;
 
@@ -29,16 +30,14 @@ async fn main() -> Result<(), &'static str> {
             let git_data = git_data::get_git_data().expect("error getting git data");
             let config_data = config_data::get_config_data().expect("error getting config");
 
-            let pull_request_url = git_api::open_pull_request(&git_data, &config_data.github_api_key, title)
-                .await?;
+            let pull_request_url = git_api::open_pull_request(
+                &git_data,
+                &config_data.github_api_key, title).await?;
 
-            println!("{}", pull_request_url);
-
-            // call the GH API to create a PR
-            // call the Slack API to post the PR link to the channel
+            slack_api::push_pr_to_slack(&pull_request_url, &config_data.slack_webhook_url, title).await?;
         }
         None => {
-            println!("Default subcommand");
+            Err("Command was not found")
         }
     }
 
