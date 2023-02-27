@@ -38,7 +38,7 @@ async fn call_gh_api(github_data: &GitData, token: &String, title: &String) -> R
 fn get_url_from_response(response: String) -> Result<String, &'static str> {
     let root: Value = serde_json::from_str(response.as_str()).expect("Unable to parse JSON");
 
-    let url: Option<&str> = root.get("url")
+    let url: Option<&str> = root.get("html_url")
         .and_then(|value| value.as_str());
 
     match url {

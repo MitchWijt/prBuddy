@@ -37,7 +37,7 @@ async fn main() -> Result<(), &'static str> {
             slack_api::push_pr_to_slack(&pull_request_url, &config_data.slack_webhook_url, title).await?;
         }
         None => {
-            Err("Command was not found")
+            println!("Command was not found");
         }
     }
 
