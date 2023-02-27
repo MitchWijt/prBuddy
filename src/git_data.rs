@@ -54,9 +54,9 @@ fn get_command_output(args: Vec<Vec<&str>>) -> Result<String, &'static str> {
 
 fn get_data_from_url(url: String) -> GitUrlData {
     return if url.contains("git@") {
-        get_repo_info_https(&url)
-    } else {
         get_repo_info_ssh(&url)
+    } else {
+        get_repo_info_https(&url)
     }
 }
 
