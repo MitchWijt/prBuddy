@@ -53,6 +53,27 @@ fn get_command_output(args: Vec<Vec<&str>>) -> Result<String, &'static str> {
 }
 
 fn get_data_from_url(url: String) -> GitUrlData {
+    return if url.contains("git@") {
+        get_repo_info_ssh(&url)
+    } else {
+        get_repo_info_https(&url)
+    }
+}
+
+fn get_repo_info_ssh(url: &String) -> GitUrlData {
+    let split = url.split("/");
+    let vector: Vec<&str> = split.collect();
+
+    let owner = *vector.get(0).unwrap();
+    let repo_name = *vector.get(1).unwrap();
+
+    return GitUrlData {
+        owner: String::from(owner.replace("git@github.com:", "")),
+        repo_name: String::from(repo_name.replace(".git", ""))
+    }
+}
+
+fn get_repo_info_https(url: &String) -> GitUrlData {
     let split = url.split("/");
     let vector: Vec<&str> = split.collect();
 
