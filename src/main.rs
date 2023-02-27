@@ -6,8 +6,6 @@ mod slack_api;
 extern crate core;
 
 use clap::{Parser, Subcommand};
-use serde_json::Value;
-use serde_json::json;
 use crate::git_data::GitData;
 
 #[derive(Parser)]

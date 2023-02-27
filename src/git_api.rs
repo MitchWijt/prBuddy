@@ -1,5 +1,3 @@
-use std::io::Read;
-use reqwest::get;
 use serde_json::Value;
 use serde_json::json;
 use crate::GitData;

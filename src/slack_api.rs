@@ -1,7 +1,4 @@
-use reqwest::get;
-use serde_json::Value;
 use serde_json::json;
-use crate::GitData;
 
 pub async fn push_pr_to_slack(pr_url: &String, webhook_url: &String, title: &String) -> Result<String, &'static str> {
     let body = json!({
