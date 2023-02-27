@@ -1,3 +1,4 @@
+use std::io::Read;
 use reqwest::get;
 use serde_json::Value;
 use serde_json::json;
@@ -31,8 +32,8 @@ async fn call_gh_api(github_data: &GitData, token: &String, title: &String) -> R
         .await
         .expect("Call to GH API Failed");
 
-    let data = resp.text().await.expect("Getting response.text() failed");
-    Ok(data)
+    let response_text = resp.text().await.expect("Getting response.text() failed");
+    Ok(response_text)
 }
 
 fn get_url_from_response(response: String) -> Result<String, &'static str> {
