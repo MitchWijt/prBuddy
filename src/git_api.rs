@@ -1,3 +1,4 @@
+use reqwest::{Response, StatusCode};
 use serde_json::Value;
 use serde_json::json;
 use crate::GitData;
@@ -30,8 +31,12 @@ async fn call_gh_api(github_data: &GitData, token: &String, title: &String) -> R
         .await
         .expect("Call to GH API Failed");
 
-    let response_text = resp.text().await.expect("Getting response.text() failed");
-    Ok(response_text)
+    let status = resp.status().to_string();
+    let body = resp.text().await.expect("Getting response.text() failed");
+
+    handle_api_error(&status, &body).await?;
+
+    Ok(body)
 }
 
 fn get_url_from_response(response: String) -> Result<String, &'static str> {
@@ -44,4 +49,18 @@ fn get_url_from_response(response: String) -> Result<String, &'static str> {
         Some(value) => Ok(String::from(value)),
         None => Err("Was not able to get URL from result")
     }
+}
+
+async fn handle_api_error(status: &String, body: &String) -> Result<(), &'static str> {
+    if status.contains("422") {
+        if body.contains("head") && body.contains("invalid") {
+            return Err("Branch name does not exist on remote. Make sure to push changes first");
+        } else if body.contains("A pull request already exists") {
+            return Err("Pull Request already exists");
+        }
+    } else if !status.contains("200") {
+        return Err("GH API Error");
+    }
+
+    Ok(())
 }

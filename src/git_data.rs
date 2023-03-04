@@ -39,7 +39,6 @@ fn get_git_command_args<'a>() -> GitCommandArgs<'a> {
     return GitCommandArgs {
         branch: vec![vec!["git", "rev-parse", "--abbrev-ref", "HEAD"]],
         main_branch: vec![vec!["git", "remote", "show", "origin"], vec!["awk", r#"/HEAD branch/ {print $NF}"#]],
-        // main_branch: vec![vec!["git", "symbolic-ref", "refs/remotes/origin/HEAD"], vec!["sed", "s@^refs/remotes/origin/@@"]],
         remote_url: vec![vec!["git", "config", "--get", "remote.origin.url"]],
     }
 }
