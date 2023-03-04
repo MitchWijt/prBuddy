@@ -62,7 +62,7 @@ async fn handle_api_error(status: &String, body: &String) -> Result<(), &'static
         } else if body.contains("A pull request already exists") {
             return Err("Pull Request already exists");
         }
-    } else if !status.contains("200") {
+    } else if status.contains("201") == false {
         return Err("GH API Error");
     }
 
