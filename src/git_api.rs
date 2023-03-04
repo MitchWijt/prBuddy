@@ -31,6 +31,7 @@ async fn call_gh_api(github_data: &GitData, token: &String, title: &String) -> R
         .expect("Call to GH API Failed");
 
     let response_text = resp.text().await.expect("Getting response.text() failed");
+    println!("The STATUS IS: {}", resp.status());
     Ok(response_text)
 }
 
