@@ -30,7 +30,9 @@ async fn main() -> Result<(), &'static str> {
 
             let pull_request_url = git_api::open_pull_request(
                 &git_data,
-                &config_data.github_api_key, title).await?;
+                &config_data.github_api_key,
+                title,
+                description).await?;
 
             slack_api::push_pr_to_slack(&pull_request_url, &config_data.slack_webhook_url, title).await?;
         }

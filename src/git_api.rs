@@ -1,19 +1,23 @@
-use reqwest::{Response, StatusCode};
 use serde_json::Value;
 use serde_json::json;
 use crate::GitData;
 
-pub async fn open_pull_request(github_data: &GitData, token: &String, title: &String) -> Result<String, &'static str> {
-    let response = call_gh_api(github_data, token, title).await?;
+pub async fn open_pull_request(github_data: &GitData, token: &String, title: &String, description: &Option<String>) -> Result<String, &'static str> {
+    let response = call_gh_api(github_data, token, title, description).await?;
     let url = get_url_from_response(response).expect("Parsing URL from response failed");
 
     Ok(url)
 }
 
-async fn call_gh_api(github_data: &GitData, token: &String, title: &String) -> Result<String, &'static str> {
+async fn call_gh_api(github_data: &GitData, token: &String, title: &String, description: &Option<String>) -> Result<String, &'static str> {
+    let desc = match description {
+        Some(v) => String::from(v),
+        None => String::from("New pull request")
+    };
+
     let body = json!({
         "title": title,
-        "body": "New pull request",
+        "body": &desc,
         "head": github_data.branch,
         "base": github_data.main_branch
     });
