@@ -30,6 +30,8 @@ PR_BUDDY_SLACK_WEBHOOK_URL=<YOUR WEBHOOK URL>
 PR_BUDDY_GH_API_KEY=<GITHUB PERSONAL ACCESS TOKEN>
 ```
 
-You're all set :-)
+### Commands
+- `pr_buddy push-pr <PR_TITLE>`
+- `pr_buddy push-pr <PR_TITLE> <PR_DESCRIPTION>`
 
-now you can push your changes to a branch and open a PR with the following command `pr_buddy push-pr <PR_TITLE>`
+You're all set :-) Happy coding!
