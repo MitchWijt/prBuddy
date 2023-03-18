@@ -7,12 +7,16 @@ pub struct GitData {
     pub owner: String,
 }
 
+#[derive(PartialEq)]
+#[derive(Debug)]
 struct GitCommandArgs<'a> {
     branch: Vec<Vec<&'a str>>,
     main_branch: Vec<Vec<&'a str>>,
     remote_url: Vec<Vec<&'a str>>,
 }
 
+#[derive(PartialEq)]
+#[derive(Debug)]
 struct GitUrlData {
     repo_name: String,
     owner: String,
@@ -82,5 +86,59 @@ fn get_repo_info_https(url: &String) -> GitUrlData {
     return GitUrlData {
         owner: String::from(owner),
         repo_name: String::from(repo_name.replace(".git", ""))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn get_git_command_args_returns_correct_args() {
+        //given
+        let command_args = get_git_command_args();
+
+        let expected: GitCommandArgs = GitCommandArgs {
+            branch: vec![vec!["git", "rev-parse", "--abbrev-ref", "HEAD"]],
+            main_branch: vec![vec!["git", "remote", "show", "origin"], vec!["awk", r#"/HEAD branch/ {print $NF}"#]],
+            remote_url: vec![vec!["git", "config", "--get", "remote.origin.url"]],
+        };
+
+        //then
+        assert_eq!(command_args, expected);
+    }
+
+    #[test]
+    fn get_data_from_ssh_url_returns_correct_git_data() {
+        //given
+        let remote_url_ssh = String::from("git@github.com:MitchWijt/prBuddy.git");
+
+        //when
+        let url_data = get_data_from_url(remote_url_ssh);
+
+        //then
+        let expected: GitUrlData = GitUrlData {
+            owner: String::from("MitchWijt"),
+            repo_name: String::from("prBuddy"),
+        };
+
+        assert_eq!(url_data, expected);
+    }
+
+    #[test]
+    fn get_data_from_https_url_returns_correct_git_data() {
+        //given
+        let remote_url_ssh = String::from("https://github.com/MitchWijt/prBuddy.git");
+
+        //when
+        let url_data = get_data_from_url(remote_url_ssh);
+
+        //then
+        let expected: GitUrlData = GitUrlData {
+            owner: String::from("MitchWijt"),
+            repo_name: String::from("prBuddy"),
+        };
+
+        assert_eq!(url_data, expected);
     }
 }
