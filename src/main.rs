@@ -2,6 +2,7 @@ mod git_data;
 mod config_data;
 mod git_api;
 mod slack_api;
+mod git_structs;
 
 extern crate core;
 
@@ -26,11 +27,11 @@ async fn main() -> Result<(), &'static str> {
     match &cli.command {
         Some(Commands::PushPR {title, description}) => {
             let git_data = git_data::get_git_data().expect("error getting git data");
-            let config_data = config_data::get_config_data().expect("error getting config");
+            let config_data = config_data::get_config_data();
 
             let pull_request_url = git_api::open_pull_request(
                 &git_data,
-                &config_data.github_api_key,
+                &config_data,
                 title,
                 description).await?;
 
