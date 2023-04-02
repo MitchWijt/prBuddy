@@ -83,6 +83,7 @@ async fn open_merge_request(project: &GitlabProject, git_data: &GitData, access_
 
     let resp = client.post(url)
         .header("Accept", "application/json")
+        .header("Content-Type", "application/json")
         .header("Authorization", format!("Bearer {}", String::from(access_token)))
         .body(body.to_string())
         .send()
@@ -90,11 +91,13 @@ async fn open_merge_request(project: &GitlabProject, git_data: &GitData, access_
         .expect("Creating merge request failed");
 
     let status = resp.status().to_string();
-    if !status.eq("200 OK") {
+    let body = resp.text().await.expect("Getting response.text() failed");
+
+    if !status.eq("201 Created") {
         return Err("Creating merge request API call failed")
     }
 
-    let merge_request: MergeRequestResponse = serde_json::from_str(&*resp.text().await.expect("Getting response.text() failed"))
+    let merge_request: MergeRequestResponse = serde_json::from_str(body.as_str())
         .expect("JSON validation failed");
 
     Ok(merge_request)
