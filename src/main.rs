@@ -35,7 +35,7 @@ async fn main() -> Result<(), &'static str> {
                 title,
                 description).await?;
 
-            slack_api::push_pr_to_slack(&pull_request_url, &config_data, title).await?;
+            slack_api::push_pr_to_slack(&pull_request_url, &config_data.slack_webhook_url, title).await?;
 
             println!("Created PR ✨ {}", pull_request_url);
         }
