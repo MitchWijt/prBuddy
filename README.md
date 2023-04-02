@@ -19,15 +19,22 @@ run the following command to install with homebrew:
 5. place this binary in your machine
 
 ### Config variables
-prBuddy uses 2 config variables in order to work correctly. 
-These are your Slack webhook URL and your GitHub personal access token.
+prBuddy uses multiple config variables in order to work correctly.
 Make sure to export these in your machine, for example in the `.zshrc` file.
 
-here is an example for the ENV variables. Both of these variables need to be included:
+here is an example for the ENV variables for GitHub or GitLab:
 
+*GitHub*:
 ```
 PR_BUDDY_SLACK_WEBHOOK_URL=<YOUR WEBHOOK URL>
-PR_BUDDY_GH_API_KEY=<GITHUB PERSONAL ACCESS TOKEN>
+PB_GITHUB_KEY=<GITHUB PERSONAL ACCESS TOKEN>
+```
+
+*GitLab*:
+```
+PR_BUDDY_SLACK_WEBHOOK_URL=<YOUR WEBHOOK URL>
+PB_GITLAB_KEY=<GITHUB PERSONAL ACCESS TOKEN>
+USE_GITLAB="True" | "False"
 ```
 
 ### Commands
