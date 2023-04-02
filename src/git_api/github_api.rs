@@ -37,10 +37,6 @@ pub async fn call_api(github_data: &GitData, token: &Option<String>, title: &Str
         .expect("Call to GH API Failed");
 
     let status = resp.status().to_string();
-    if !status.eq(&String::from("200.OK")) {
-        return Err("Call to GH API Failed. Status != 200")
-    }
-
     let body = resp.text().await.expect("Getting response.text() failed");
     handle_api_error(&status, &body).await?;
 
