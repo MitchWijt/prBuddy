@@ -1,5 +1,7 @@
 use shutil::pipe;
 
+#[derive(PartialEq)]
+#[derive(Debug)]
 pub struct GitData {
     pub branch: String,
     pub main_branch: String,
@@ -10,9 +12,27 @@ pub struct GitData {
 #[derive(PartialEq)]
 #[derive(Debug)]
 struct GitCommandArgs<'a> {
-    branch: Vec<Vec<&'a str>>,
-    main_branch: Vec<Vec<&'a str>>,
-    remote_url: Vec<Vec<&'a str>>,
+    branch: Command<'a>,
+    main_branch: Command<'a>,
+    remote_url: Command<'a>,
+}
+
+#[derive(PartialEq)]
+#[derive(Debug)]
+struct Command<'a>(Vec<Vec<&'a str>>);
+
+trait CallCommand {
+    fn call(self) -> Result<String, &'static str>;
+}
+
+impl CallCommand for Command<'_> {
+    fn call(self) -> Result<String, &'static str> {
+        let output = pipe(self.0);
+        match output {
+            Ok(output_str) => Ok(output_str.replace("\n", "")),
+            Err(_e) => Err("Failed to execute command")
+        }
+    }
 }
 
 #[derive(PartialEq)]
@@ -22,70 +42,71 @@ struct GitUrlData {
     owner: String,
 }
 
-pub fn get_git_data() -> Result<GitData, &'static str> {
-    let git_command_args = get_git_command_args();
+impl GitData {
+    pub fn build() -> Result<Self, &'static str> {
+        let git_command_args = GitCommandArgs::build();
+        Self::from_command_args(git_command_args)
+    }
 
-    let branch_name = get_command_output(git_command_args.branch)?;
-    let remote_url = get_command_output(git_command_args.remote_url)?;
-    let main_branch_name = get_command_output(git_command_args.main_branch)?;
+    fn from_command_args(command_args: GitCommandArgs) -> Result<Self, &'static str> {
+        let branch_name = command_args.branch.call()?;
+        let main_branch_name = command_args.main_branch.call()?;
+        let remote_url = command_args.remote_url.call()?;
 
-    let url_data = get_data_from_url(remote_url);
+        let url_data = GitUrlData::build(remote_url);
 
-    return Ok(GitData {
-        branch: branch_name,
-        main_branch: main_branch_name,
-        repo_name: url_data.repo_name,
-        owner: url_data.owner
-    })
-}
-
-fn get_git_command_args<'a>() -> GitCommandArgs<'a> {
-    return GitCommandArgs {
-        branch: vec![vec!["git", "rev-parse", "--abbrev-ref", "HEAD"]],
-        main_branch: vec![vec!["git", "remote", "show", "origin"], vec!["awk", r#"/HEAD branch/ {print $NF}"#]],
-        remote_url: vec![vec!["git", "config", "--get", "remote.origin.url"]],
+        return Ok(GitData {
+            branch: branch_name,
+            main_branch: main_branch_name,
+            repo_name: url_data.repo_name,
+            owner: url_data.owner
+        })
     }
 }
 
-fn get_command_output(args: Vec<Vec<&str>>) -> Result<String, &'static str> {
-    let output = pipe(args);
-    match output {
-        Ok(output_str) => Ok(output_str.replace("\n", "")),
-        Err(_e) => Err("Failed to execute command")
+impl GitCommandArgs<'_> {
+    pub fn build<'a>() -> GitCommandArgs<'a> {
+        return GitCommandArgs {
+            branch: Command(vec![vec!["git", "rev-parse", "--abbrev-ref", "HEAD"]]),
+            main_branch: Command(vec![vec!["git", "remote", "show", "origin"], vec!["awk", r#"/HEAD branch/ {print $NF}"#]]),
+            remote_url: Command(vec![vec!["git", "config", "--get", "remote.origin.url"]]),
+        }
     }
 }
 
-fn get_data_from_url(url: String) -> GitUrlData {
-    return if url.contains("git@") {
-        get_repo_info_ssh(&url)
-    } else {
-        get_repo_info_https(&url)
+impl GitUrlData {
+    pub fn build(url: String) -> Self {
+        return if url.contains("git@") {
+            Self::from_ssh(url)
+        } else {
+            Self::from_https(url)
+        }
     }
-}
 
-fn get_repo_info_ssh(url: &String) -> GitUrlData {
-    let split = url.split("/");
-    let vector: Vec<&str> = split.collect();
+    fn from_https(url: String) -> Self {
+        let split = url.split("/");
+        let vector: Vec<&str> = split.collect();
 
-    let owner = *vector.get(0).unwrap();
-    let repo_name = *vector.get(1).unwrap();
+        let owner = *vector.get(3).unwrap();
+        let repo_name = *vector.get(4).unwrap();
 
-    return GitUrlData {
-        owner: String::from(owner.replace("git@github.com:", "")),
-        repo_name: String::from(repo_name.replace(".git", ""))
+        return GitUrlData {
+            owner: String::from(owner),
+            repo_name: String::from(repo_name.replace(".git", ""))
+        }
     }
-}
 
-fn get_repo_info_https(url: &String) -> GitUrlData {
-    let split = url.split("/");
-    let vector: Vec<&str> = split.collect();
+    fn from_ssh(url: String) -> Self {
+        let split = url.split("/");
+        let vector: Vec<&str> = split.collect();
 
-    let owner = *vector.get(3).unwrap();
-    let repo_name = *vector.get(4).unwrap();
+        let owner = *vector.get(0).unwrap();
+        let repo_name = *vector.get(1).unwrap();
 
-    return GitUrlData {
-        owner: String::from(owner),
-        repo_name: String::from(repo_name.replace(".git", ""))
+        return GitUrlData {
+            owner: String::from(owner.replace("git@github.com:", "")),
+            repo_name: String::from(repo_name.replace(".git", ""))
+        }
     }
 }
 
@@ -94,14 +115,35 @@ mod tests {
     use super::*;
 
     #[test]
-    fn get_git_command_args_returns_correct_args() {
+    fn git_data_from_command_args_returns_data() {
         //given
-        let command_args = get_git_command_args();
+        let git_command_args = GitCommandArgs::build();
+
+        //when
+        let git_data = GitData::from_command_args(git_command_args).unwrap();
+
+        //then
+        let expected = GitData {
+            branch: String::from("feature-refactor-code"),
+            main_branch: String::from("main"),
+            repo_name: String::from("prBuddy"),
+            owner: String::from("MitchWijt"),
+        };
+
+        assert_eq!(git_data.main_branch, expected.main_branch);
+        assert_eq!(git_data.repo_name, expected.repo_name);
+        assert_eq!(git_data.owner, expected.owner);
+    }
+
+    #[test]
+    fn git_command_args_build_returns_correct_args() {
+        //given
+        let command_args = GitCommandArgs::build();
 
         let expected: GitCommandArgs = GitCommandArgs {
-            branch: vec![vec!["git", "rev-parse", "--abbrev-ref", "HEAD"]],
-            main_branch: vec![vec!["git", "remote", "show", "origin"], vec!["awk", r#"/HEAD branch/ {print $NF}"#]],
-            remote_url: vec![vec!["git", "config", "--get", "remote.origin.url"]],
+            branch: Command(vec![vec!["git", "rev-parse", "--abbrev-ref", "HEAD"]]),
+            main_branch: Command(vec![vec!["git", "remote", "show", "origin"], vec!["awk", r#"/HEAD branch/ {print $NF}"#]]),
+            remote_url: Command(vec![vec!["git", "config", "--get", "remote.origin.url"]]),
         };
 
         //then
@@ -109,12 +151,12 @@ mod tests {
     }
 
     #[test]
-    fn get_data_from_ssh_url_returns_correct_git_data() {
+    fn git_url_data_from_ssh_returns_correct_git_data() {
         //given
         let remote_url_ssh = String::from("git@github.com:MitchWijt/prBuddy.git");
 
         //when
-        let url_data = get_data_from_url(remote_url_ssh);
+        let url_data = GitUrlData::build(remote_url_ssh);
 
         //then
         let expected: GitUrlData = GitUrlData {
@@ -126,12 +168,12 @@ mod tests {
     }
 
     #[test]
-    fn get_data_from_https_url_returns_correct_git_data() {
+    fn git_url_data_from_https_returns_correct_git_data() {
         //given
         let remote_url_ssh = String::from("https://github.com/MitchWijt/prBuddy.git");
 
         //when
-        let url_data = get_data_from_url(remote_url_ssh);
+        let url_data = GitUrlData::build(remote_url_ssh);
 
         //then
         let expected: GitUrlData = GitUrlData {

@@ -8,17 +8,19 @@ pub struct Config {
     pub gitlab_api_key: Option<String>,
 }
 
-pub fn get_config_data() -> Config {
-    let slack_webhook_url = get_value_from_env("PR_BUDDY_SLACK_WEBHOOK_URL");
-    let use_gitlab = get_value_from_env("USE_GITLAB");
-    let github_api_key = get_value_from_env("PB_GITHUB_KEY");
-    let gitlab_api_key = get_value_from_env("PB_GITLAB_KEY");
+impl Config {
+    pub fn build() -> Self {
+        let slack_webhook_url = get_value_from_env("PR_BUDDY_SLACK_WEBHOOK_URL");
+        let use_gitlab = get_value_from_env("USE_GITLAB");
+        let github_api_key = get_value_from_env("PB_GITHUB_KEY");
+        let gitlab_api_key = get_value_from_env("PB_GITLAB_KEY");
 
-    return Config{
-        slack_webhook_url,
-        use_gitlab,
-        github_api_key,
-        gitlab_api_key
+        return Config{
+            slack_webhook_url,
+            use_gitlab,
+            github_api_key,
+            gitlab_api_key
+        }
     }
 }
 
