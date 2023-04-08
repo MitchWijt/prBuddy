@@ -1,20 +1,37 @@
 use serde_json::json;
 
-pub async fn push_pr_to_slack(pr_url: &String, webhook_url: &Option<String>, title: &String) -> Result<String, &'static str> {
-    let body = json!({
-        "text": format!("PR: <{}|{}>", pr_url, title),
-    });
+pub struct SlackApi<'a> {
+    pr_url: &'a String,
+    webhook_url: &'a String,
+    title: &'a String,
+}
 
-    let webhook_url = webhook_url.as_ref().expect("Slack webhook URL was not found in ENV variables");
+impl SlackApi<'_> {
+    pub fn new<'a>(pr_url: &'a String, webhook_url: &'a Option<String>, title: &'a String) -> Result<SlackApi<'a>, &'static str> {
+        let webhook = webhook_url.as_ref().expect("Slack webhook URL was not found in ENV variables");
 
-    let client = reqwest::Client::new();
-    let resp = client.post(webhook_url)
-        .header("Content-type", "application/json")
-        .body(body.to_string())
-        .send()
-        .await
-        .expect("Call to Slack API Failed");
+        Ok(SlackApi {
+            pr_url,
+            webhook_url: webhook,
+            title
+        })
+    }
 
-    let data = resp.text().await.expect("Getting response.text() failed");
-    Ok(data)
+    pub async fn publish_pr(&self) -> Result<(), &'static str> {
+        let body = json!({
+            "text": format!("PR: <{}|{}>", self.pr_url, self.title),
+        });
+
+
+        let client = reqwest::Client::new();
+        let resp = client.post(self.webhook_url)
+            .header("Content-type", "application/json")
+            .body(body.to_string())
+            .send()
+            .await
+            .expect("Call to Slack API Failed");
+
+        resp.text().await.expect("Getting response.text() failed");
+        Ok(())
+    }
 }
