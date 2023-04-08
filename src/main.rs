@@ -7,6 +7,7 @@ mod git_structs;
 extern crate core;
 
 use clap::{Parser, Subcommand};
+use crate::config_data::Config;
 use crate::git_data::GitData;
 
 #[derive(Parser)]
@@ -26,8 +27,8 @@ async fn main() -> Result<(), &'static str> {
 
     match &cli.command {
         Some(Commands::PushPR {title, description}) => {
-            let git_data = git_data::get_git_data().expect("error getting git data");
-            let config_data = config_data::get_config_data();
+            let git_data = GitData::build().expect("error getting git data");
+            let config_data =  Config::build();
 
             let pull_request_url = git_api::open_pull_request(
                 &git_data,
