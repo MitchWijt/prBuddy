@@ -38,7 +38,7 @@ async fn main() -> Result<(), &'static str> {
             let response = if config_data.use_gitlab() {
                 let gitlab_api = GitLabApi::new(
                     &git_data,
-                    &config_data.github_api_key,
+                    &config_data.gitlab_api_key,
                     title,
                     description)?;
 
