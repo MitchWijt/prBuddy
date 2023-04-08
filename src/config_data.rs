@@ -10,10 +10,10 @@ pub struct Config {
 
 impl Config {
     pub fn build() -> Self {
-        let slack_webhook_url = get_value_from_env("PR_BUDDY_SLACK_WEBHOOK_URL");
-        let use_gitlab = get_value_from_env("USE_GITLAB");
-        let github_api_key = get_value_from_env("PB_GITHUB_KEY");
-        let gitlab_api_key = get_value_from_env("PB_GITLAB_KEY");
+        let slack_webhook_url = Self::get_value_from_env("PR_BUDDY_SLACK_WEBHOOK_URL");
+        let use_gitlab = Self::get_value_from_env("USE_GITLAB");
+        let github_api_key = Self::get_value_from_env("PB_GITHUB_KEY");
+        let gitlab_api_key = Self::get_value_from_env("PB_GITLAB_KEY");
 
         return Config{
             slack_webhook_url,
@@ -22,11 +22,24 @@ impl Config {
             gitlab_api_key
         }
     }
-}
 
-fn get_value_from_env(env_variable: &str) -> Option<String> {
-    match env::var(env_variable) {
-        Ok(value) => Some(value),
-        _other=> None
+    pub fn use_gitlab(&self) -> bool {
+        match &self.use_gitlab {
+            Some(v) => {
+                return if v.eq(&String::from("True")) {
+                    true
+                } else {
+                    false
+                }
+            },
+            None => false
+        }
+    }
+
+    fn get_value_from_env(env_variable: &str) -> Option<String> {
+        match env::var(env_variable) {
+            Ok(value) => Some(value),
+            _other=> None
+        }
     }
 }
