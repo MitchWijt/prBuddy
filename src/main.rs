@@ -23,7 +23,12 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    PushPR {title: String, description: Option<String>},
+    PushPR {
+        title: String,
+        description: Option<String>,
+        #[clap(long)]
+        no_slack: bool,
+    },
 }
 
 #[tokio::main]
@@ -31,7 +36,7 @@ async fn main() -> Result<(), &'static str> {
     let cli = Cli::parse();
 
     match &cli.command {
-        Some(Commands::PushPR {title, description}) => {
+        Some(Commands::PushPR {title, description, no_slack}) => {
             let git_data = GitData::build().expect("error getting git data");
             let config_data =  Config::build();
 
@@ -53,8 +58,10 @@ async fn main() -> Result<(), &'static str> {
                 github_api.open_pull_request().await?
             };
 
-            let slack_api = SlackApi::new(&response.url, &config_data.slack_webhook_url, &title)?;
-            slack_api.publish_pr().await?;
+            if *no_slack == false {
+                let slack_api = SlackApi::new(&response.url, &config_data.slack_webhook_url, &title)?;
+                slack_api.publish_pr().await?;
+            }
 
             println!("Created PR ✨ {}", response.url);
         }
