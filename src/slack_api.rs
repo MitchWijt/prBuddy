@@ -21,7 +21,7 @@ impl SlackApi<'_> {
 }
 
 #[async_trait]
-impl Publish for SlackApi {
+impl Publish for SlackApi<'_> {
     async fn publish(&self) -> Result<(), &'static str> {
         let body = json!({
             "text": format!("PR: <{}|{}>", self.pr_url, self.title),

@@ -21,7 +21,7 @@ impl DiscordApi<'_> {
 }
 
 #[async_trait]
-impl Publish for DiscordApi {
+impl Publish for DiscordApi<'_> {
     async fn publish(&self) -> Result<(), &'static str> {
         let body = json!({
             "username": "PrBuddy",
