@@ -2,31 +2,10 @@ use shutil::pipe;
 
 #[derive(PartialEq)]
 #[derive(Debug)]
-pub struct GitData {
-    pub branch: String,
-    pub main_branch: String,
-    pub repo_name: String,
-    pub owner: String,
-}
-
-#[derive(PartialEq)]
-#[derive(Debug)]
-struct GitCommandArgs<'a> {
-    branch: Command<'a>,
-    main_branch: Command<'a>,
-    remote_url: Command<'a>,
-}
-
-#[derive(PartialEq)]
-#[derive(Debug)]
 struct Command<'a>(Vec<Vec<&'a str>>);
 
-trait CallCommand {
-    fn call(self) -> Result<String, &'static str>;
-}
-
-impl CallCommand for Command<'_> {
-    fn call(self) -> Result<String, &'static str> {
+impl Command<'_> {
+    pub fn call(self) -> Result<String, &'static str> {
         let output = pipe(self.0);
         match output {
             Ok(output_str) => Ok(output_str.replace("\n", "")),
@@ -37,9 +16,11 @@ impl CallCommand for Command<'_> {
 
 #[derive(PartialEq)]
 #[derive(Debug)]
-struct GitUrlData {
-    repo_name: String,
-    owner: String,
+pub struct GitData {
+    pub branch: String,
+    pub main_branch: String,
+    pub repo_name: String,
+    pub owner: String,
 }
 
 impl GitData {
@@ -64,6 +45,14 @@ impl GitData {
     }
 }
 
+#[derive(PartialEq)]
+#[derive(Debug)]
+struct GitCommandArgs<'a> {
+    branch: Command<'a>,
+    main_branch: Command<'a>,
+    remote_url: Command<'a>,
+}
+
 impl GitCommandArgs<'_> {
     pub fn build<'a>() -> GitCommandArgs<'a> {
         return GitCommandArgs {
@@ -72,6 +61,13 @@ impl GitCommandArgs<'_> {
             remote_url: Command(vec![vec!["git", "config", "--get", "remote.origin.url"]]),
         }
     }
+}
+
+#[derive(PartialEq)]
+#[derive(Debug)]
+struct GitUrlData {
+    repo_name: String,
+    owner: String,
 }
 
 impl GitUrlData {

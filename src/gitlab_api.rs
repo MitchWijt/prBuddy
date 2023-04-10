@@ -1,8 +1,8 @@
 use async_trait::async_trait;
-use crate::GitData;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use crate::git_api::{ApiPayload, GitApi, GitApiResponse};
+use crate::git_data::GitData;
 
 pub struct GitLabApi<'a> {
     git_data: &'a GitData,
