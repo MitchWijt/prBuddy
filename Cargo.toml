@@ -1,6 +1,6 @@
 [package]
 name = "pr_buddy"
-version = "3.0.0"
+version = "3.0.1"
 authors = ["Mitchel Wijt <mitchel@wijt.net>"]
 license = "MIT"
 description = "CLI tool to open a PR/merge request and automatically post the link to your communication service"
