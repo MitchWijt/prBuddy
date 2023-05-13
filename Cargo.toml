@@ -1,6 +1,14 @@
 [package]
 name = "pr_buddy"
-version = "0.1.0"
+version = "3.0.0"
+authors = ["Mitchel Wijt <mitchel@wijt.net>"]
+licence = "MIT"
+description = "CLI tool to open a PR/merge request and automatically post the link to your communication service"
+readme = "README.md"
+homepage = "https://github.com/MitchWijt/prBuddy"
+repository = "https://github.com/MitchWijt/prBuddy"
+keywords = ["cli", "git", "pull-request", "merge-request"]
+categories = ["command-line-utilities"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
