@@ -2,7 +2,7 @@
 name = "pr_buddy"
 version = "3.0.0"
 authors = ["Mitchel Wijt <mitchel@wijt.net>"]
-licence = "MIT OR Apache-2.0"
+license = "MIT"
 description = "CLI tool to open a PR/merge request and automatically post the link to your communication service"
 readme = "README.md"
 homepage = "https://github.com/MitchWijt/prBuddy"
