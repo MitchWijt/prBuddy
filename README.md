@@ -11,6 +11,10 @@ copying PR titles and URLs but have this done for you with one single command :-
 run the following command to install with homebrew:
 - ```brew tap MitchWijt/prbuddy && brew install prbuddy```
 
+### Using Cargo
+run the following command to install with cargo:
+- ```cargo install pr_buddy```
+
 ### Manually
 1. Clone or fork this repo
 2. make sure you have installed cargo
